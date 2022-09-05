@@ -7,7 +7,7 @@ const mongoose = require('mongoose'); // 0 - import mongoose
 const app = express();
 app.use(cors());
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT; 
 
 //http:localhost:3001/test
 app.get('/test', (request, response) => {
@@ -64,7 +64,7 @@ function getBooksHandler(req,res) {
       else
       {
           console.log(result);
-          res.send(result);
+          res.json(result);
       }
   })
 }
