@@ -6,8 +6,8 @@ const cors = require('cors');
 const mongoose = require('mongoose'); // 0 - import mongoose
 const app = express();
 app.use(cors());
-
-const PORT = process.env.PORT; 
+app.use(express.json());
+const PORT = process.env.PORT||3001; 
 
 //http:localhost:3001/test
 app.get('/test', (request, response) => {
@@ -53,8 +53,21 @@ async function seedData(){
 }
  
 // seedData();
+app.get('/test',testHandler);
+// http://localhost:3001/addBook
+app.post('/addBook',addBookHandler);
+//http://localhost:3001/deleteBook/:id
+app.delete('/deleteBook/:id',deleteBookHandler);
 //http://localhost:3001/books
 app.get('/books', getBooksHandler)
+
+function testHandler(req,res) {
+  res.status(200).send("You are requesting the test route");
+}
+
+
+
+
 function getBooksHandler(req,res) {
   ModelBooks.find({},(err,result)=>{
       if(err)
@@ -68,6 +81,47 @@ function getBooksHandler(req,res) {
       }
   })
 }
-// 
+ 
+async function addBookHandler(req,res) {
+  console.log(req.body);
+  
+  const {bookTitle,bookDescription,bookStatus} = req.body; //Destructuring assignment
+  await ModelBooks.create({
+      title : bookTitle,
+      description : bookDescription,
+      status:bookStatus
+  });
+
+  ModelBooks.find({},(err,result)=>{
+      if(err)
+      {
+          console.log(err);
+      }
+      else
+      {
+          // console.log(result);
+          res.send(result);
+      }
+  })
+}
+
+function deleteBookHandler(req,res) {
+  const bookId = req.params.id;
+  ModelBooks.deleteOne({_id:bookId},(err,result)=>{
+      
+    ModelBooks.find({},(err,result)=>{
+          if(err)
+          {
+              console.log(err);
+          }
+          else
+          {
+              // console.log(result);
+              res.send(result);
+          }
+      })
+
+    })
+  }
 
 app.listen(PORT, () => console.log(`listening on ${PORT}`));
