@@ -15,8 +15,7 @@ response.send('test request received')
 
 })
 // step 1
-mongoose.connect('mongodb://localhost:27017/Books', 
-{useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect('mongodb://Class-301:1234@ac-cuyt8bs-shard-00-00.uphaivt.mongodb.net:27017,ac-cuyt8bs-shard-00-01.uphaivt.mongodb.net:27017,ac-cuyt8bs-shard-00-02.uphaivt.mongodb.net:27017/?ssl=true&replicaSet=atlas-11s1u4-shard-0&authSource=admin&retryWrites=true&w=majority',{useNewUrlParser: true, useUnifiedTopology: true});
 
 const Book = new mongoose.Schema({ //define the schema (structure)
   title: String,
@@ -52,7 +51,7 @@ async function seedData(){
   await thirdBook.save();
 }
  
-// seedData();
+seedData();
 app.get('/test',testHandler);
 // http://localhost:3001/addBook
 app.post('/addBook',addBookHandler);
@@ -60,6 +59,7 @@ app.post('/addBook',addBookHandler);
 app.delete('/deleteBook/:id',deleteBookHandler);
 //http://localhost:3001/books
 app.get('/books', getBooksHandler)
+app.put('/updateBook/:id',updateBookHandler);
 
 function testHandler(req,res) {
   res.status(200).send("You are requesting the test route");
@@ -123,5 +123,30 @@ function deleteBookHandler(req,res) {
 
     })
   }
+
+  function updateBookHandler(req,res){
+    const id = req.params.id;
+    const {title,description,status} = req.body; //Destructuring assignment
+    console.log(req.body);
+    ModelBooks.findByIdAndUpdate(id,{title,description,status},(err,result)=>{
+        if(err) {
+            console.log(err);
+        }
+        else {
+          ModelBooks.find({},(err,result)=>{
+                if(err)
+                {
+                    console.log(err);
+                }
+                else
+                {
+                    // console.log(result);
+                    res.send(result);
+                }
+            })
+        }
+    })
+
+}
 
 app.listen(PORT, () => console.log(`listening on ${PORT}`));
