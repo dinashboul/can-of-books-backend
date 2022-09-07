@@ -20,7 +20,8 @@ mongoose.connect('mongodb://Class-301:1234@ac-cuyt8bs-shard-00-00.uphaivt.mongod
 const Book = new mongoose.Schema({ //define the schema (structure)
   title: String,
   description: String,
-  status: String
+  status: String,
+  email:String
 });
 const ModelBooks = mongoose.model('Book', Book); //compile the schem into a model           
 //step 2
@@ -51,7 +52,7 @@ async function seedData(){
   await thirdBook.save();
 }
  
-seedData();
+// seedData();
 app.get('/test',testHandler);
 // http://localhost:3001/addBook
 app.post('/addBook',addBookHandler);
@@ -85,11 +86,12 @@ function getBooksHandler(req,res) {
 async function addBookHandler(req,res) {
   console.log(req.body);
   
-  const {bookTitle,bookDescription,bookStatus} = req.body; //Destructuring assignment
+  const {bookTitle,bookDescription,bookStatus,bookEmail} = req.body; //Destructuring assignment
   await ModelBooks.create({
       title : bookTitle,
       description : bookDescription,
-      status:bookStatus
+      status:bookStatus,
+      email:bookEmail,
   });
 
   ModelBooks.find({},(err,result)=>{
