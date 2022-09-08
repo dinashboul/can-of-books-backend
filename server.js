@@ -21,9 +21,9 @@ const Book = new mongoose.Schema({ //define the schema (structure)
   title: String,
   description: String,
   status: String,
-  email:String
+  email : String,
 });
-const ModelBooks = mongoose.model('Book', Book); //compile the schem into a model           
+const ModelBooks = mongoose.model('books', Book); //compile the schem into a model           
 //step 2
 // let seedData=require('./ModelScema');
 // app.get('/seedData', seedData);
@@ -32,19 +32,24 @@ async function seedData(){
   const firstBook = new ModelBooks({
       title: "The Prophet and Other Writings",
       description: "Part of the Knickerbocker Classics series, a modern design makes this timeless book a perfect travel companion.",
-      status: "Available"
+      status: "Available",
+      email:"dinaalshboul@gmail.com"
   })
 
   const secondBook = new ModelBooks({
       title: "The Silent Patient",
       description: "The Richard and Judy bookclub pick and Sunday Times Bestseller: The record-breaking, multimillion copy Sunday Times bestselling thriller and Richard & Judy book club pick",
-      status: "Not Available"
+      status: "Not Available",
+      email:"dinaalshboul@gmail.com"
+
   })
 
   const thirdBook = new ModelBooks({
       title: "The Time Keeper",
       description: "From the author who's inspired millions worldwide with books like Tuesdays with Morrie and The Five People You Meet in Heaven comes his most imaginative novel yet, The Time Keeper--a compelling fable about the first man on Earth to count the hours.",
-      status: "Avilable"
+      status: "Avilable",
+      email:"dinaalshboul@gmail.com"
+
   })
 
   await firstBook.save();
@@ -53,13 +58,14 @@ async function seedData(){
 }
  
 // seedData();
+app.get('/books', getBooksHandler)
 app.get('/test',testHandler);
 // http://localhost:3001/addBook
 app.post('/addBook',addBookHandler);
 //http://localhost:3001/deleteBook/:id
 app.delete('/deleteBook/:id',deleteBookHandler);
 //http://localhost:3001/books
-app.get('/books', getBooksHandler)
+
 app.put('/updateBook/:id',updateBookHandler);
 
 function testHandler(req,res) {
@@ -70,6 +76,8 @@ function testHandler(req,res) {
 
 
 function getBooksHandler(req,res) {
+    const email= req.query.email;
+    console.log("my email is ",email);
   ModelBooks.find({},(err,result)=>{
       if(err)
       {
@@ -78,7 +86,7 @@ function getBooksHandler(req,res) {
       else
       {
           console.log(result);
-          res.json(result);
+          res.send(result);
       }
   })
 }
@@ -86,15 +94,15 @@ function getBooksHandler(req,res) {
 async function addBookHandler(req,res) {
   console.log(req.body);
   
-  const {bookTitle,bookDescription,bookStatus,bookEmail} = req.body; //Destructuring assignment
+  const {bookTitle,bookDescription,bookStatus,email} = req.body; //Destructuring assignment
   await ModelBooks.create({
       title : bookTitle,
       description : bookDescription,
       status:bookStatus,
-      email:bookEmail,
+      email:email,
   });
 
-  ModelBooks.find({},(err,result)=>{
+  ModelBooks.find({email:email},(err,result)=>{
       if(err)
       {
           console.log(err);
@@ -109,9 +117,10 @@ async function addBookHandler(req,res) {
 
 function deleteBookHandler(req,res) {
   const bookId = req.params.id;
+  const email= req.query.email;
   ModelBooks.deleteOne({_id:bookId},(err,result)=>{
       
-    ModelBooks.find({},(err,result)=>{
+    ModelBooks.find({email:email},(err,result)=>{
           if(err)
           {
               console.log(err);
@@ -128,14 +137,14 @@ function deleteBookHandler(req,res) {
 
   function updateBookHandler(req,res){
     const id = req.params.id;
-    const {title,description,status} = req.body; //Destructuring assignment
+    const {title,description,status,email} = req.body; //Destructuring assignment
     console.log(req.body);
-    ModelBooks.findByIdAndUpdate(id,{title,description,status},(err,result)=>{
+    ModelBooks.findByIdAndUpdate(id,{title,description,status,email},(err,result)=>{
         if(err) {
             console.log(err);
         }
         else {
-          ModelBooks.find({},(err,result)=>{
+          ModelBooks.find({email:email},(err,result)=>{
                 if(err)
                 {
                     console.log(err);
