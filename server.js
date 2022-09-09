@@ -78,7 +78,7 @@ function testHandler(req,res) {
 function getBooksHandler(req,res) {
     const email= req.query.email;
     console.log("my email is ",email);
-  ModelBooks.find({},(err,result)=>{
+  ModelBooks.find({email:email},(err,result)=>{
       if(err)
       {
           console.log(err);
